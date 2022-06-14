@@ -2,23 +2,26 @@
 import avatar from '../images/avatarka.jpg';
 import api from '../utils/Api.js';
 import React from 'react';
+import Card from './Card';
 
+const Main = ({onEditProfile, onAddPlace, onEditAvatar, onCardClick}) => {
 
-
-const Main = ({ onEditProfile, onAddPlace, onEditAvatar}) => {
-
+    //state variables of components
     const [userName, setUserName] = React.useState('Загрузка');
     const [userDescription, setUserDesctription] = React.useState('...');
     const [userAvatar, setUserAvatar] = React.useState(avatar);
+    const [cards, setCards] = React.useState([]);
 
+    //get cards and user information
     React.useEffect(() => {
-        api.getUserInfo()
-        .then(({avatar, name, about}) => {
-            setUserName(name);
-            setUserDesctription(about)
-            setUserAvatar(avatar);
+        Promise.all([api.getUserInfo(), api.getInitialCards()])
+        .then(([userData, userCard]) => {
+        setUserName(userData.name);
+        setUserDesctription(userData.about);
+        setUserAvatar(userData.avatar);
+        setCards(userCard);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(`Ошибка: ${err}`))
     }, []);
 
 
@@ -37,6 +40,9 @@ const Main = ({ onEditProfile, onAddPlace, onEditAvatar}) => {
             <button type="button" className="profile__add-btn" aria-label="добавить фотографии" onClick={onAddPlace}></button>
         </section>
         <section aria-label="Фотографии красивых мест" className="photo-grid">
+            {cards.map((card) => (
+                <Card card={card} key={card._id} onCardClick={onCardClick}/>
+            ))}
         </section>
     </main>
     );

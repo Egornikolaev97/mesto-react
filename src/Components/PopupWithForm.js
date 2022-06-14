@@ -1,11 +1,5 @@
-const PopupWithForm = ({
-    name,
-    title,
-    titleBtn,
-    isOpen,
-    children,
-    onClose,
-}) => {
+const PopupWithForm = ({name, title, titleButton, isOpen, children, onClose}) => {
+
     return (
         <div className={`popup popup_${name}` + (isOpen && ' popup_opened')}>
         <div className="popup__container">
@@ -16,7 +10,7 @@ const PopupWithForm = ({
                     {children}
                 </fieldset>
                 <button type="submit" className="form__submit form__submit_type-edit"
-                    aria-label="сохранить изменения">{titleBtn}</button>
+                    aria-label="сохранить изменения">{titleButton}</button>
             </form>
         </div>
     </div>
