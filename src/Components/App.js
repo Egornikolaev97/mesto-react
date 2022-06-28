@@ -4,7 +4,8 @@ import Main from './Main';
 import Footer from './Footer';
 import PopupWithForm from './PopupWithForm';
 import ImagePopup from './ImagePopup';
-
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import api from '../utils/Api.js';
 
 
 const App = () => {
@@ -14,6 +15,19 @@ const App = () => {
     const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState(null);
+
+    const [currentUser, setCurrentUser] = React.useState([]);
+    const [cards, setCards] = React.useState([]);
+
+
+    React.useEffect(() => {
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
+      .then(([userData, userCard]) => {
+      setCurrentUser(userData)
+      setCards(userCard);
+      })
+      .catch((err) => console.log(`Ошибка: ${err}`))
+  }, []);
 
 
     //functions for openning popups
@@ -37,6 +51,22 @@ const App = () => {
         setSelectedCard(card);
     };
 
+    const handleCardLike = (card) => {
+      const isLiked = card.likes.some(i => i._id === currentUser._id);
+
+      api.toggleLikeStatus(card._id, !isLiked).then((newCard) => {
+            setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+        }).catch((err) => console.log(err));
+    }
+
+    const handleCardDelete = (card) => {
+      api.deleteCard(card._id)
+      .then(() => {
+        setCards((state) => state.filter((c) => c._id !== card._id));
+      }).catch((err) => console.log(err));
+    }
+
+
     //function for closing popups
     const closeAllPopups = () => {
         setEditProfilePopupOpen(false);
@@ -48,12 +78,16 @@ const App = () => {
 
   return (
     <div className="page">
+      <CurrentUserContext.Provider value={currentUser}>
         <Header />
         <Main
           onEditProfile={handleEditProfileClick}
           onAddPlace={handleAddPlaceClick}
           onEditAvatar={handleEditAvatarClick}
           onCardClick={handleCardClick}
+          onCardLike={handleCardLike}
+          onCardDelete={handleCardDelete}
+          cards={cards}
         />
         <Footer />
 
@@ -149,21 +183,9 @@ const App = () => {
         <ImagePopup
         card={selectedCard}
         onClose={closeAllPopups} />
-
+        </CurrentUserContext.Provider>
     </div>
   );
 }
 
 export default App;
-
-
-// <div className="popup popup_delete">
-// <div className="popup__container">
-//     <form className="form form_delete">
-//     <h2 className="form__title">Вы уверены?</h2>
-//     <button type="submit" className="form__submit form__submit-type-confirm" aria-label="сохранить изменения">Да
-//     </button>
-//     <button type="button" className="popup__close popup__close-delete" aria-label="закрыть форму">Закрыть</button>
-//     </form>
-// </div>
-// </div>
