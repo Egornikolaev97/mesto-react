@@ -1,10 +1,10 @@
-const PopupWithForm = ({name, title, titleButton, isOpen, children, onClose}) => {
+const PopupWithForm = ({name, title, titleButton, isOpen, children, onClose, onSubmit}) => {
 
     return (
         <div className={`popup popup_${name}` + (isOpen && ' popup_opened')}>
         <div className="popup__container">
             <button type="button" className="popup__close" aria-label="закрыть форму" onClick={onClose}>Закрыть</button>
-            <form name="profile" className="form form_profile-edit" noValidate>
+            <form name="profile" className="form form_profile-edit" noValidate onSubmit={onSubmit}>
                 <h2 className="form__title">{title}</h2>
                 <fieldset className="form__fieldset">
                     {children}

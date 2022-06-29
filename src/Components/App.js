@@ -3,6 +3,8 @@ import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
 import PopupWithForm from './PopupWithForm';
+import EditProfilePopup from './EditProfilePopup';
+import EditAvatarPopup from './EditAvatarPopup';
 import ImagePopup from './ImagePopup';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import api from '../utils/Api.js';
@@ -14,10 +16,11 @@ const App = () => {
     const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);
     const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
+
     const [selectedCard, setSelectedCard] = React.useState(null);
+    const [cards, setCards] = React.useState([]);
 
     const [currentUser, setCurrentUser] = React.useState([]);
-    const [cards, setCards] = React.useState([]);
 
 
     React.useEffect(() => {
@@ -28,7 +31,6 @@ const App = () => {
       })
       .catch((err) => console.log(`Ошибка: ${err}`))
   }, []);
-
 
     //functions for openning popups
 
@@ -54,7 +56,8 @@ const App = () => {
     const handleCardLike = (card) => {
       const isLiked = card.likes.some(i => i._id === currentUser._id);
 
-      api.toggleLikeStatus(card._id, !isLiked).then((newCard) => {
+      api.toggleLikeStatus(card._id, !isLiked)
+      .then((newCard) => {
             setCards((state) => state.map((c) => c._id === card._id ? newCard : c));
         }).catch((err) => console.log(err));
     }
@@ -66,6 +69,21 @@ const App = () => {
       }).catch((err) => console.log(err));
     }
 
+    const handleUpdateUser = (data) => {
+      api.editUserInfo(data)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      }).catch((err) => console.log(err))
+    }
+
+    const handleUpdateAvatar = (data) => {
+      api.editAvatar(data)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      }).catch((err) => console.log(err))
+    }
 
     //function for closing popups
     const closeAllPopups = () => {
@@ -90,43 +108,11 @@ const App = () => {
           cards={cards}
         />
         <Footer />
-
-        <PopupWithForm
-        name='edit'
-        title='Редактировать профиль'
-        titleButton='Сохранить'
+        <EditProfilePopup
         isOpen={isEditProfilePopupOpen}
         onClose={closeAllPopups}
-        >
-          <label className="form__field">
-            <input
-            id="name-input"
-            name="name"
-            placeholder="Введите имя"
-            autoComplete="off"
-            type="text"
-            required
-            minLength={2}
-            maxLength={40}
-            className="form__input form__input_type_name"
-            />
-            <span className="name-input-error form__error"></span>
-          </label>
-          <label className="form__field">
-            <input
-            id="about-input"
-            placeholder="Введите профессию"
-            name="about"
-            autoComplete="off"
-            type="text"
-            required
-            minLength={2}
-            maxLength={200}
-            className="form__input form__input_type_about" />
-              <span className="about-input-error form__error"></span>
-          </label>
-        </PopupWithForm>
-
+        onUpdateUser={handleUpdateUser}
+        />
         <PopupWithForm
         name='add'
         title='Новое место'
@@ -160,25 +146,11 @@ const App = () => {
             </label>
         </PopupWithForm>
 
-        <PopupWithForm
-        name='avatar'
-        title='Обновить аватар'
-        titleButton='Сохранить изменения'
+        <EditAvatarPopup
         isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
-        >
-        <label className="form__field">
-            <input
-            id="avatar-input"
-            name="avatar"
-            autoComplete="off"
-            placeholder="ссылка на картинку"
-            type="url"
-            className="form__input form__input_type_link"
-            required />
-                <span className="avatar-input-error form__error"></span>
-            </label>
-        </PopupWithForm>
+        onUpdateUser={handleUpdateAvatar}
+        />
 
         <ImagePopup
         card={selectedCard}
