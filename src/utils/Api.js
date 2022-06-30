@@ -60,23 +60,6 @@ class Api {
         .then(this._checkResponse);
     }
 
-
-    // addLike(id) {
-    //     return fetch(`${this._url}cards/${id}/likes`, {
-    //         method: 'PUT',
-    //         headers: this._headers,
-    //     })
-    //     .then(this._checkResponse);
-    // }
-
-    // dislike(id) {
-    //     return fetch(`${this._url}cards/${id}/likes`, {
-    //         method: 'DELETE',
-    //         headers: this._headers,
-    //     })
-    //     .then(this._checkResponse);
-    // }
-
     toggleLikeStatus(id, isLiked) {
         if(isLiked) {
             return fetch(`${this._url}cards/${id}/likes`, {

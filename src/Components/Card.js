@@ -12,12 +12,10 @@ const Card = ({ card, onCardClick, onCardLike, onCardDelete }) => {
 
     const handleCardClick = () => {
         onCardClick(card);
-        // console.log(card);
     }
 
     const handleCardLike = () => {
         onCardLike(card);
-        // console.log(card);
     }
 
     const handleCardDelete = () => {
