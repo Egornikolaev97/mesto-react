@@ -1,29 +1,22 @@
 import React from 'react';
 import PopupWithForm from './PopupWithForm';
+import useFormValidation from '../hooks/useFormValidation';
 
 const AddPlacePopup = ({ isOpen, onClose, onAddPlace }) => {
-  const [name, setName] = React.useState('');
-  const [link, setLink] = React.useState('');
+  const { values, errors, isValid, handleChange, resetForm, setValues, setIsValid } = useFormValidation({ name: '', link: ''});
 
   React.useEffect(() => {
-    setName('');
-    setLink('');
-  }, [isOpen]);
-
-  const handleChangeName = (event) => {
-    setName(event.target.value);
-  };
-
-  const handleChangeLink = (event) => {
-    setLink(event.target.value);
-  };
+    setValues({ name: '', link: ''});
+    setIsValid(false);
+    resetForm();
+  }, [ isOpen, setValues, setIsValid, resetForm]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
     onAddPlace({
-      name: name,
-      link: link,
+      name: values.name,
+      link: values.link,
     });
   };
 
@@ -34,7 +27,8 @@ const AddPlacePopup = ({ isOpen, onClose, onAddPlace }) => {
     titleButton="Создать"
     isOpen={isOpen}
     onClose={onClose}
-    onSubmit={handleSubmit}>
+    onSubmit={handleSubmit}
+    isValid={isValid}>
       <label className="form__field">
         <input
           id="place-input"
@@ -46,10 +40,10 @@ const AddPlacePopup = ({ isOpen, onClose, onAddPlace }) => {
           required
           minLength={2}
           maxLength={30}
-          onChange={handleChangeName}
-          value={name ? name : ''}
+          onChange={handleChange}
+          value={values.name}
         />
-        <span className="place-input-error form__error"></span>
+        <span className={`form__error ${!isValid && 'form__error_active'}`}>{!isValid && errors.name}</span>
       </label>
       <label className="form__field">
         <input
@@ -60,10 +54,10 @@ const AddPlacePopup = ({ isOpen, onClose, onAddPlace }) => {
           type="url"
           className="form__input form__input_type_link"
           required
-          onChange={handleChangeLink}
-          value={link ? link : ''}
+          onChange={handleChange}
+          value={values.link}
         />
-        <span className="link-input-error form__error"></span>
+        <span className={`form__error ${!isValid && 'form__error_active'}`}>{errors.link}</span>
       </label>
     </PopupWithForm>
   );

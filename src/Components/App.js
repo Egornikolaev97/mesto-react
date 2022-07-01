@@ -12,6 +12,7 @@ import api from '../utils/Api.js';
 
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
+
 const App = () => {
   //states variables of components
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);

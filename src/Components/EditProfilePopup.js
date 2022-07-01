@@ -1,82 +1,71 @@
 import React from 'react';
 import PopupWithForm from './PopupWithForm';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import useFormValidation from '../hooks/useFormValidation';
 
 const EditProfilePopup = ({ isOpen, onClose, onUpdateUser }) => {
 
-    const [name, setName] = React.useState('');
-    const [description, setDescription] = React.useState('');
-    const currentUser = React.useContext(CurrentUserContext);
+  const currentUser = React.useContext(CurrentUserContext);
+  const { values, errors, isValid, handleChange, resetForm, setValues, setIsValid } = useFormValidation({ name: '', about: ''});
 
+  React.useEffect(() => {
+    setValues({ name: currentUser.name, about: currentUser.about});
+    setIsValid(true);
+    resetForm()
+  }, [currentUser, isOpen, setValues, setIsValid, resetForm]);
 
-    React.useEffect(() => {
-        setName(currentUser.name);
-        setDescription(currentUser.about);
-    }, [currentUser, isOpen]);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onUpdateUser({
+      name:  values.name,
+      about: values.about
+    });
+  };
 
+  return (
+    <PopupWithForm
+    name="edit"
+    title="Редактировать профиль"
+    titleButton="Сохранить"
+    isOpen={isOpen}
+    onClose={onClose}
+    onSubmit={handleSubmit}
+    isValid={isValid}>
 
-    const handleChangeName = (event) => {
-        setName(event.target.value);
-    }
-
-
-    const handleChangeDescription = (event) => {
-        setDescription(event.target.value);
-    }
-
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        onUpdateUser({
-            name,
-            about: description
-        });
-    }
-
-
-    return (
-        <PopupWithForm
-        name='edit'
-        title='Редактировать профиль'
-        titleButton='Сохранить'
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={handleSubmit}
-        >
-          <label className="form__field">
-            <input
-            id="name-input"
-            name="name"
-            placeholder="Введите имя"
-            autoComplete="off"
-            type="text"
-            required
-            minLength={2}
-            maxLength={40}
-            className="form__input form__input_type_name"
-            onChange={handleChangeName}
-            value={name ? name : ''}
-            />
-            <span className="name-input-error form__error"></span>
-          </label>
-          <label className="form__field">
-            <input
-            id="about-input"
-            placeholder="Введите профессию"
-            name="about"
-            autoComplete="off"
-            type="text"
-            required
-            minLength={2}
-            maxLength={200}
-            className="form__input form__input_type_about"
-            onChange={handleChangeDescription}
-            value={description ? description : ''}
-            />
-              <span className="about-input-error form__error"></span>
-          </label>
-        </PopupWithForm>
-    );
-}
+      <label className="form__field">
+        <input
+          id="name-input"
+          name="name"
+          placeholder="Введите имя"
+          autoComplete="off"
+          type="text"
+          required
+          minLength={2}
+          maxLength={40}
+          className="form__input form__input_type_name"
+          onChange={handleChange}
+          value={values.name}
+        />
+        <span className={`form__error ${!isValid && 'form__error_active'}`}>{!isValid && errors.name}</span>
+      </label>
+      <label className="form__field">
+        <input
+          id="about-input"
+          placeholder="Введите профессию"
+          name="about"
+          autoComplete="off"
+          type="text"
+          required
+          minLength={2}
+          maxLength={200}
+          className="form__input form__input_type_about"
+          onChange={handleChange}
+          value={values.about}
+        />
+        <span className={`form__error ${!isValid && 'form__error_active'}`}>{errors.about}</span>
+      </label>
+    </PopupWithForm>
+  );
+};
 
 export default EditProfilePopup;
